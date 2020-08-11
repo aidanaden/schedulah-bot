@@ -51,7 +51,7 @@ def start(update, context):
     """
     
     update.message.reply_text(welcome_msg, 
-    reply_keyboard=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
 
 
     return CREATE_EDIT
@@ -67,7 +67,7 @@ def create_new_calender(update, context):
     update.message.reply_text(
         'Creating a new calender!'
         'Which day would you like to set activites for?',
-        reply_keyboard=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
     
     
     return DAY
@@ -82,7 +82,7 @@ def edit_existing_calender(update, context):
     update.message.reply_text(
         'Editing your existing calender!'
         'Which day would you like to edit activites for?',
-        reply_keyboard=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
 
 
     return None
@@ -97,7 +97,7 @@ def view_existing_calender(update, context):
     update.message.reply_text(
         'Viewing your existing calender!'
         'Which day would you like to view activities for? :)',
-        reply_keyboard=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
 
 
 
@@ -105,10 +105,20 @@ def view_existing_calender(update, context):
 def enter_calender_day(update, context):
     """User enters day, guide user to enter details of activity"""
     
+    
+    # remove previous 'day' value so 
+    # that we can insert current 'day' value
+    if 'day' in context.user_data:
+        del context.user_data['day']
 
+
+    # set new 'day' value
     text = update.message.text
     context.user_data['day'] = text  
 
+
+    # request user to add activity in 
+    # ACTIVITY FORMAT
     update.message.reply_text(
         f'Accessing your {text} schedule!'
         'To add an activity to your schedule,'
@@ -163,7 +173,8 @@ def add_activity_calender_day(update, context):
     activity = {
         'time_start': activity_time_start,
         'time_end': activity_time_end,
-        'location': activity_name,
+        'name': activity_name,
+        'location': activity_loc,
         'details': activity_details
         }
     
@@ -171,8 +182,8 @@ def add_activity_calender_day(update, context):
     if context.user_data[day] is None:
         context.user_data[day] = [activity]
     else:
-        Update.message.reply_text(f'Looks like you\'ve already got some activities 
-        set for your {day} schedule!\nAdding your newly created activity: \"{activity_name}\" to your schedule!')
+        update.message.reply_text(f"""Looks like you\'ve already got some activities set for your {day} schedule!
+        \nAdding your newly created activity: \"{activity_name}\" to your schedule!""")
 
         # TODO: CHECK IF NEW ACTIVITY ADDED COINCIDES WITH ANY EXISTING ACTIVITIES
         
@@ -183,9 +194,9 @@ def add_activity_calender_day(update, context):
     exit_keyboard = ReplyKeyboardMarkup(exit_options, one_time_keyboard=True)
 
 
-    Update.message.reply_text(f'Would you like to add more activities 
+    update.message.reply_text(f"""Would you like to add more activities 
                                 to your {day} schedule or would you like 
-                                to add activities to another day?', reply_keyboard=exit_keyboard)
+                                to add activities to another day?""", reply_markup=exit_keyboard)
 
     
 
@@ -195,14 +206,15 @@ def add_activity_calender_day(update, context):
 
 
 
-def add_more_activities_calender_day(Update, Context):
+def add_more_activities_calender_day(update, context):
     """User enters day, guide user to enter details of activity"""
     
 
     day = context.user_data['day']   
 
+
     update.message.reply_text(
-        f'Adding to your {text} schedule!'
+        f'Adding to your {day} schedule!'
         'To add an activity to your schedule,'
         'Enter the details of your activity in the format below.\n\n'
         '<EXAMPLE>\n'
@@ -212,18 +224,18 @@ def add_more_activities_calender_day(Update, Context):
         'DETAILS: ELEARNING until further notice'
     )
 
-    return ACTIVITIES
+    return ACTIVITY
 
 
 
 
-def change_calender_day(Update, Context):
+def change_calender_day(update, context):
     """Which day would you like to set up activities for?"""
 
 
     update.message.reply_text(
         'Which day would you like to set activites for? :)',
-        reply_keyboard=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
     
     
     return DAY
@@ -231,7 +243,7 @@ def change_calender_day(Update, Context):
 
 
 
-def confirm_complete(Update, Context):
+def confirm_complete(update, context):
     """
     User enters im done after adding activity to day schedule.
     Ask for final confirmation (if user would like to view existing 
@@ -242,8 +254,8 @@ def confirm_complete(Update, Context):
     exit_options = [['Confirm exit!','View schedule and tHEN exit!']]
     exit_keyboard = ReplyKeyboardMarkup(exit_options,one_time_keyboard=True)
 
-    Update.message.reply_text(f'Are you sure you\'re done with your calender? 
-    You may also proceed to view your existing calender before exiting the bot!', reply_keyboard=exit_keyboard)
+    update.message.reply_text(f"""Are you sure you\'re done with your calender? 
+    You may also proceed to view your existing calender before exiting the bot!""", reply_markup=exit_keyboard)
 
 
     return COMPLETED
@@ -253,13 +265,13 @@ def confirm_complete(Update, Context):
 
 
 
-def completed_and_exit(Update, Context):
+def completed_and_exit(update, context):
     """
     User confirms exit, end conversation and quit from schedulah-bot
     """
 
 
-    Update.message.reply_text('Bye bYE!!')
+    update.message.reply_text('Bye bYE!!')
 
 
     return ConversationHandler.END
@@ -307,7 +319,7 @@ def main():
 
             ADDED_ACTIVITY: [
                 MessageHandler(Filters.regex('^(Add more)$'), add_more_activities_calender_day),
-                MessageHandler(Filters.regex('^(Change day!)$'), create_calender_day),
+                MessageHandler(Filters.regex('^(Change day!)$'), change_calender_day),
                 MessageHandler(Filters.regex('^(I\'m done!)$'), confirm_complete)
             ],
 
@@ -316,7 +328,7 @@ def main():
                 MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), completed_and_exit)
             ]
         },
-        fallbacks=[MessageHandler(MessageHandler(Filters.regex('^(I\'m done!|done!)$'), confirm_complete))],
+        fallbacks=[MessageHandler(Filters.regex('^(I\'m done!|done!)$'), confirm_complete)],
         name='my_schedulah',
         persistent=True
     )
