@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 
-CREATE_EDIT, DAY, ACTIVITY, ADDED_ACTIVITY, VIEW_ALL, COMPLETED = range(6)
+CREATE_EDIT, DAY, VIEW, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
 
 DAYS_REPLY_KEYBOARD = [['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']]
 
@@ -31,22 +31,25 @@ def start(update, context):
     reply_keyboard = [['Create', 'Edit', 'View']]
 
 
-    welcome_msg = """Welcome! I'm the Schedulah Bot. Create your weekly/daily 
-    schedule with us and we'll send reminders for your activities before they 
-    start! (just in case you forget) ;)
-    
-    How to use me?
+    welcome_msg = """Welcome! I'm the Schedulah Bot.
+Create your weekly/daily schedule with us and we'll send reminders for your activities before they start! (just in case you forget) ;)
 
-    I've got 3 commands
-    1. Create
-    2. Edit
-    3. View
 
-    Create - create a new schedule with me! 
+How to use me?
 
-    Edit - edit your existing schedule with me! :)
 
-    View - view your existing schedule with me! ;)
+I've got 3 commands:
+
+1. Create
+2. Edit
+3. View
+
+
+Create - create a new schedule with me! 
+
+Edit - edit your existing schedule with me! :)
+
+View - view your existing schedule with me! ;)
     
     """
     
@@ -64,9 +67,11 @@ def create_new_calender(update, context):
     """Which day would you like to set up activities for? :)"""
 
 
-    update.message.reply_text(
-        'Creating a new calender!'
-        'Which day would you like to set activites for?',
+    reply_msg = """Creating a new calender!
+Which day would you like to 
+set activites for?"""
+
+    update.message.reply_text(reply_msg,
         reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
     
     
@@ -99,6 +104,32 @@ def view_existing_calender(update, context):
         'Which day would you like to view activities for? :)',
         reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
 
+    
+    return VIEW
+
+
+
+
+def view_calender_day(update, context):
+    """User enters day, output all activities added on day"""
+
+
+    text = update.message.text
+
+    
+    if text not in context.user_data:
+        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {text} yet!')
+
+    elif context.user_data[text] is None:
+        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {text} yet!')
+    
+    else:
+        activities = context.user_data[text]
+
+
+    update.message.reply_text(activities)
+
+    return VIEW
 
 
 
@@ -119,16 +150,18 @@ def enter_calender_day(update, context):
 
     # request user to add activity in 
     # ACTIVITY FORMAT
-    update.message.reply_text(
-        f'Accessing your {text} schedule!'
-        'To add an activity to your schedule,'
-        'Enter the details of your activity in the format below.\n\n'
-        '<EXAMPLE>\n'
-        'TIME: 1200-1400'
-        'NAME: CS2030'
-        'LOCATION: HOME'
-        'DETAILS: ELEARNING until further notice'
-    )
+    reply_msg = f"""Accessing your {text} schedule!
+To add an activity to your schedule,
+Enter the details of your activity in the format below.
+        
+<EXAMPLE>
+TIME: 1200-1400
+NAME: CS2030
+LOCATION: HOME
+DETAILS: ELEARNING until further notice"""
+
+
+    update.message.reply_text(reply_msg)
 
     return ACTIVITY
 
@@ -179,8 +212,12 @@ def add_activity_calender_day(update, context):
         }
     
 
-    if context.user_data[day] is None:
+    if day not in context.user_data:
         context.user_data[day] = [activity]
+
+    elif context.user_data[day] is None:
+        context.user_data[day] = [activity]
+
     else:
         update.message.reply_text(f"""Looks like you\'ve already got some activities set for your {day} schedule!
         \nAdding your newly created activity: \"{activity_name}\" to your schedule!""")
@@ -194,9 +231,12 @@ def add_activity_calender_day(update, context):
     exit_keyboard = ReplyKeyboardMarkup(exit_options, one_time_keyboard=True)
 
 
-    update.message.reply_text(f"""Would you like to add more activities 
-                                to your {day} schedule or would you like 
-                                to add activities to another day?""", reply_markup=exit_keyboard)
+    reply_msg = f"""Would you like to add more activities 
+to your {day} schedule or would you like 
+to add activities to another day?"""
+
+
+    update.message.reply_text(reply_msg, reply_markup=exit_keyboard)
 
     
 
@@ -213,16 +253,19 @@ def add_more_activities_calender_day(update, context):
     day = context.user_data['day']   
 
 
-    update.message.reply_text(
-        f'Adding to your {day} schedule!'
-        'To add an activity to your schedule,'
-        'Enter the details of your activity in the format below.\n\n'
-        '<EXAMPLE>\n'
-        'TIME: 1200-1400'
-        'NAME: CS2030'
-        'LOCATION: HOME'
-        'DETAILS: ELEARNING until further notice'
-    )
+    reply_msg = f"""Adding to your {day} schedule!
+To add an activity to your schedule,
+Enter the details of your activity in the format below.
+        
+<EXAMPLE>
+TIME: 1200-1400
+NAME: CS2030
+LOCATION: HOME
+DETAILS: ELEARNING until further notice"""
+
+
+    update.message.reply_text(reply_msg)
+
 
     return ACTIVITY
 
@@ -254,8 +297,8 @@ def confirm_complete(update, context):
     exit_options = [['Confirm exit!','View schedule and tHEN exit!']]
     exit_keyboard = ReplyKeyboardMarkup(exit_options,one_time_keyboard=True)
 
-    update.message.reply_text(f"""Are you sure you\'re done with your calender? 
-    You may also proceed to view your existing calender before exiting the bot!""", reply_markup=exit_keyboard)
+    update.message.reply_text(f"""Are you sure you\'re done with your calender?\n 
+You may also proceed to view your existing calender before exiting the bot!""", reply_markup=exit_keyboard)
 
 
     return COMPLETED
@@ -311,6 +354,16 @@ def main():
                 MessageHandler(Filters.regex('^(Friday)$'), enter_calender_day),
                 MessageHandler(Filters.regex('^(Saturday)$'), enter_calender_day),
                 MessageHandler(Filters.regex('^(Sunday)$'), enter_calender_day)
+            ],
+
+            VIEW: [
+                MessageHandler(Filters.regex('^(Monday)$'), view_calender_day), 
+                MessageHandler(Filters.regex('^(Tuesday)$'), view_calender_day),
+                MessageHandler(Filters.regex('^(Wednesday)$'), view_calender_day),
+                MessageHandler(Filters.regex('^(Thursday)$'), view_calender_day), 
+                MessageHandler(Filters.regex('^(Friday)$'), view_calender_day),
+                MessageHandler(Filters.regex('^(Saturday)$'), view_calender_day),
+                MessageHandler(Filters.regex('^(Sunday)$'), view_calender_day)
             ],
 
             ACTIVITY: [
