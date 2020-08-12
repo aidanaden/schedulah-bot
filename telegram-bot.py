@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 CREATE_EDIT, DAY, VIEW, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
 
-DAYS_REPLY_KEYBOARD = [['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']]
+DAYS_REPLY_KEYBOARD = [[' Monday ',' Tuesday ',' Wednesday '], [' Thursday ',' Friday ',' Saturday '], [' Sunday ']]
 
 
 
@@ -54,7 +54,7 @@ View - view your existing schedule with me! ;)
     """
     
     update.message.reply_text(welcome_msg, 
-    reply_markup=ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=True))
+    reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
 
     return CREATE_EDIT
@@ -72,7 +72,7 @@ Which day would you like to
 set activites for?"""
 
     update.message.reply_text(reply_msg,
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
     
     
     return DAY
@@ -87,7 +87,7 @@ def edit_existing_calender(update, context):
     update.message.reply_text(
         'Editing your existing calender!'
         'Which day would you like to edit activites for?',
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
 
 
     return None
@@ -102,7 +102,7 @@ def view_existing_calender(update, context):
     update.message.reply_text(
         'Viewing your existing calender!'
         'Which day would you like to view activities for? :)',
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
 
     
     return VIEW
@@ -114,20 +114,33 @@ def view_calender_day(update, context):
     """User enters day, output all activities added on day"""
 
 
-    text = update.message.text
+    day = update.message.text
 
     
-    if text not in context.user_data:
-        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {text} yet!')
+    if day not in context.user_data:
+        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {day} yet!')
 
-    elif context.user_data[text] is None:
-        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {text} yet!')
+    elif context.user_data[day] is None:
+        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {day} yet!')
     
     else:
-        activities = context.user_data[text]
+        activities = context.user_data[day]
+        activities_msg = f"Here are your activities for {day.capitalize()}!\n\n"
 
+        for activity in activities:
+            
+            time_start = activity['time_start']
+            time_end = activity['time_end']
+            name = activity['name']
+            location = activity['location']
+            details = activity['details']
 
-    update.message.reply_text(activities)
+            activity_msg = f"""NAME: {name}\nTIME: {time_start} - {time_end}\nLOCATION: {location}\nDETAILS: {details}\n\n"""
+            activities_msg += activity_msg
+        
+
+        update.message.reply_text(activities_msg)
+    
 
     return VIEW
 
@@ -228,7 +241,7 @@ def add_activity_calender_day(update, context):
 
 
     exit_options = [['Add more!', 'Change day!', 'I\'m done!']]
-    exit_keyboard = ReplyKeyboardMarkup(exit_options, one_time_keyboard=True)
+    exit_keyboard = ReplyKeyboardMarkup(exit_options, resize_keyboard=True, one_time_keyboard=False)
 
 
     reply_msg = f"""Would you like to add more activities 
@@ -239,8 +252,6 @@ to add activities to another day?"""
     update.message.reply_text(reply_msg, reply_markup=exit_keyboard)
 
     
-
-
     return ADDED_ACTIVITY
 
 
@@ -278,7 +289,7 @@ def change_calender_day(update, context):
 
     update.message.reply_text(
         'Which day would you like to set activites for? :)',
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, one_time_keyboard=True))
+        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
     
     
     return DAY
@@ -295,7 +306,7 @@ def confirm_complete(update, context):
 
 
     exit_options = [['Confirm exit!','View schedule and tHEN exit!']]
-    exit_keyboard = ReplyKeyboardMarkup(exit_options,one_time_keyboard=True)
+    exit_keyboard = ReplyKeyboardMarkup(exit_options, resize_keyboard=True, one_time_keyboard=False)
 
     update.message.reply_text(f"""Are you sure you\'re done with your calender?\n 
 You may also proceed to view your existing calender before exiting the bot!""", reply_markup=exit_keyboard)
