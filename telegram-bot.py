@@ -30,7 +30,7 @@ def start(update, context):
     """Send a message when the command /start is issued."""
     
 
-    reply_values = ['/Create', '/Edit', '/View']
+    reply_values = ['/create', '/edit', '/view']
     start_keyboard = schedulah_keyboard(layout=[3]).create_keyboard(reply_values)
 
 
@@ -43,19 +43,19 @@ How to use me?
 
 I've got 3 commands:
 
-1. /Create
-2. /Edit
-3. /View
-4. /Done
+1. /create
+2. /edit
+3. /view
+4. /done
 
 
-/Create - create a new schedule with me! 
+/create - create a new schedule with me! 
 
-/Edit - edit your existing schedule with me! :)
+/edit - edit your existing schedule with me! :)
 
-/View - view your existing schedule with me! ;)
+/view - view your existing schedule with me! ;)
 
-/Done - exit from the bot at any time! :>    
+/done - exit from the bot at any time! :>    
     """
     
     update.message.reply_text(welcome_msg, 
