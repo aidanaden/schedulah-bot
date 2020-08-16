@@ -456,7 +456,7 @@ def main():
 
             COMPLETED: [
                 MessageHandler(Filters.regex('^(Confirm exit!)$'), completed_and_exit),
-                MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), completed_and_exit)
+                MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), view_and_exit)
             ]
         },
         fallbacks=[MessageHandler(Filters.regex('^(I\'m done!|done!|/Done)$'), confirm_complete)],
