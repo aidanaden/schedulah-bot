@@ -59,7 +59,7 @@ I've got 3 commands:
     """
     
     update.message.reply_text(welcome_msg, 
-    reply_markup=ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True, one_time_keyboard=False))
+    reply_markup=ReplyKeyboardMarkup(start_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
 
     return CREATE_EDIT
