@@ -468,7 +468,7 @@ def main():
                 MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), view_and_exit)
             ]
         },
-        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', back_to_previous_option)],
+        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', back_to_start_state)],
         name='my_schedulah',
         persistent=True
     )
