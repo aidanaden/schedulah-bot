@@ -324,7 +324,7 @@ DETAILS: ELEARNING until further notice"""
     update.message.reply_text(reply_msg)
 
 
-    return DAY
+    return ACTIVITY
 
 
 
