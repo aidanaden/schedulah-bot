@@ -146,6 +146,18 @@ def get_day_activities(day, context):
 
 
 
+def _view_all_calender_days(all_activities_msg="", days=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']):
+
+    for day in days:
+
+        day_activities_msg = get_day_activities(day, context)
+        all_activities_msg += day_activities_msg
+    
+    return all_activities_msg
+
+
+
+
 def view_calender_day(update, context):
     """User enters day, output all activities added on day"""
 
@@ -172,14 +184,7 @@ def view_calender_day(update, context):
 
 def view_all_calender_days(update, context):
 
-    days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
-
-    all_activities_msg = ""
-
-    for day in days:
-
-        day_activities_msg = get_day_activities(day, context)
-        all_activities_msg += day_activities_msg
+    all_activities_msg = _view_all_calender_days()
 
     update.message.reply_text(all_activities_msg, parse_mode=ParseMode.HTML)
 
@@ -376,6 +381,21 @@ def completed_and_exit(update, context):
 
     return ConversationHandler.END
 
+
+
+
+def view_and_exit(update, context):
+    """
+    User requests to view schedule, then exit
+    """
+
+    all_activities_msg = _view_all_calender_days()
+
+    update.message.reply_text(all_activities_msg, parse_mode=ParseMode.HTML)
+    update.message.reply_text('Bye bYE!!')
+
+    
+    return ConversationHandler.END
 
 
 
