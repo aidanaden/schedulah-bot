@@ -19,8 +19,7 @@ logger = logging.getLogger(__name__)
 
 CREATE_EDIT, DAY, VIEW, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
 
-DAYS_REPLY_KEYBOARD = [[' Monday ',' Tuesday ',' Wednesday '], [' Thursday ',' Friday ',' Saturday ', ' Sunday ']]
-VIEW_DAYS_REPLY_KEYBOARD = [[' Monday ',' Tuesday ',' Wednesday '], [' Thursday ',' Friday ',' Saturday ', ' Sunday '], [' View All Days ']]
+VIEW_VALUES = [' Monday ',' Tuesday ',' Wednesday ',' Thursday ',' Friday ',' Saturday ', ' Sunday ',' View All Days ']
 
 
 
@@ -31,7 +30,8 @@ def start(update, context):
     """Send a message when the command /start is issued."""
     
 
-    reply_keyboard = [['/Create', '/Edit', '/View'], ['/Done']]
+    reply_values = ['/Create', '/Edit', '/View']
+    start_keyboard = schedulah_keyboard(layout=[3]).create_keyboard(reply_values)
 
 
     welcome_msg = """Welcome! I'm the Schedulah Bot.
@@ -71,13 +71,14 @@ def create_new_calender(update, context):
     """Create new calender/timetable"""
     """Which day would you like to set up activities for? :)"""
 
+    days_keyboard = schedulah_keyboard().create_days_keyboard()
 
     reply_msg = """Creating a new calender!
 Which day would you like to 
 set activites for?"""
 
     update.message.reply_text(reply_msg,
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
+        reply_markup=ReplyKeyboardMarkup(days_keyboard, resize_keyboard=True, one_time_keyboard=False))
     
     
     return DAY
@@ -88,11 +89,12 @@ set activites for?"""
 def edit_existing_calender(update, context):
     """Edit existing calender/timetable"""
 
+    days_keyboard = schedulah_keyboard().create_days_keyboard()
 
     update.message.reply_text(
         'Editing your existing calender!'
         'Which day would you like to edit activites for?',
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
+        reply_markup=ReplyKeyboardMarkup(days_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
 
     return None
@@ -103,11 +105,13 @@ def edit_existing_calender(update, context):
 def view_existing_calender(update, context):
     """View existing calender/timetable"""
 
+    view_days_values = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday', 'View All Days']
+    view_keyboard = schedulah_keyboard(layout=(3,4,1)).create_keyboard(view_day_values)
 
     update.message.reply_text(
         'Viewing your existing calender!'
         'Which day would you like to view activities for? :)',
-        reply_markup=ReplyKeyboardMarkup(VIEW_DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
+        reply_markup=ReplyKeyboardMarkup(view_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
     
     return VIEW
@@ -291,16 +295,17 @@ def add_activity_calender_day(update, context):
         context.user_data[day].append(activity)
 
 
-    exit_options = [['Add more!', 'Change day!', 'I\'m done!']]
-    exit_keyboard = ReplyKeyboardMarkup(exit_options, resize_keyboard=True, one_time_keyboard=True)
-
+    exit_values = ['Add more!', 'Change day!']
+    exit_keyboard = schedulah_keyboard(layout=[2]).create_keyboard(exit_values)
+    
 
     reply_msg = f"""Would you like to add more activities 
 to your {day} schedule or would you like 
 to add activities to another day?"""
 
 
-    update.message.reply_text(reply_msg, reply_markup=exit_keyboard)
+    update.message.reply_text(reply_msg, 
+    reply_markup=ReplyKeyboardMarkup(exit_keyboard, resize_keyboard=True, one_time_keyboard=True))
 
     
     return ADDED_ACTIVITY
@@ -338,9 +343,11 @@ def change_calender_day(update, context):
     """Which day would you like to set up activities for?"""
 
 
+    day_keyboard = schedulah_keyboard().create_days_keyboard()
+
     update.message.reply_text(
         'Which day would you like to set activites for? :)',
-        reply_markup=ReplyKeyboardMarkup(DAYS_REPLY_KEYBOARD, resize_keyboard=True, one_time_keyboard=False))
+        reply_markup=ReplyKeyboardMarkup(day_keyboard, resize_keyboard=True, one_time_keyboard=False))
     
     
     return DAY
@@ -355,12 +362,16 @@ def confirm_complete(update, context):
     calender or simply exit from bot)
     """
 
+    exit_msg = f"""Are you sure you\'re done with your calender?\n 
+You may also proceed to view your existing calender before exiting the bot!"""
+
 
     exit_options = [['Confirm exit!','View schedule and tHEN exit!']]
-    exit_keyboard = ReplyKeyboardMarkup(exit_options, resize_keyboard=True, one_time_keyboard=True)
+    exit_keyboard = schedulah_keyboard(layout=[2]).create_keyboard(exit_options)
 
-    update.message.reply_text(f"""Are you sure you\'re done with your calender?\n 
-You may also proceed to view your existing calender before exiting the bot!""", reply_markup=exit_keyboard)
+
+    update.message.reply_text(exit_msg, 
+    reply_markup=ReplyKeyboardMarkup(exit_options, resize_keyboard=True, one_time_keyboard=True))
 
 
     return COMPLETED
@@ -400,6 +411,16 @@ def view_and_exit(update, context):
 
 
 
+def back_to_start_state(update, context):
+    """
+    Move back to start state.
+    """
+    
+    return CREATE_EDIT
+
+
+
+
 def main():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
@@ -418,29 +439,17 @@ def main():
         entry_points=[CommandHandler('start', start)],
         states={
             CREATE_EDIT: [
-                MessageHandler(Filters.regex('^(/Create)$'), create_new_calender), 
-                MessageHandler(Filters.regex('^(/Edit)$'), edit_existing_calender),
-                MessageHandler(Filters.regex('^(/View)$'), view_existing_calender)
+                MessageHandler(Filters.regex('^(/create)$'), create_new_calender), 
+                MessageHandler(Filters.regex('^(/edit)$'), edit_existing_calender),
+                MessageHandler(Filters.regex('^(/view)$'), view_existing_calender)
                 ],
 
             DAY: [
-                MessageHandler(Filters.regex('^(Monday)$'), enter_calender_day), 
-                MessageHandler(Filters.regex('^(Tuesday)$'), enter_calender_day),
-                MessageHandler(Filters.regex('^(Wednesday)$'), enter_calender_day),
-                MessageHandler(Filters.regex('^(Thursday)$'), enter_calender_day), 
-                MessageHandler(Filters.regex('^(Friday)$'), enter_calender_day),
-                MessageHandler(Filters.regex('^(Saturday)$'), enter_calender_day),
-                MessageHandler(Filters.regex('^(Sunday)$'), enter_calender_day)
+                MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), enter_calender_day)
             ],
 
             VIEW: [
-                MessageHandler(Filters.regex('^(Monday)$'), view_calender_day), 
-                MessageHandler(Filters.regex('^(Tuesday)$'), view_calender_day),
-                MessageHandler(Filters.regex('^(Wednesday)$'), view_calender_day),
-                MessageHandler(Filters.regex('^(Thursday)$'), view_calender_day), 
-                MessageHandler(Filters.regex('^(Friday)$'), view_calender_day),
-                MessageHandler(Filters.regex('^(Saturday)$'), view_calender_day),
-                MessageHandler(Filters.regex('^(Sunday)$'), view_calender_day),
+                MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), view_calender_day), 
                 MessageHandler(Filters.regex('^(View All Days)$'), view_all_calender_days)
             ],
 
@@ -459,7 +468,7 @@ def main():
                 MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), view_and_exit)
             ]
         },
-        fallbacks=[MessageHandler(Filters.regex('^(I\'m done!|done!|/Done)$'), confirm_complete)],
+        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', back_to_previous_option)],
         name='my_schedulah',
         persistent=True
     )
