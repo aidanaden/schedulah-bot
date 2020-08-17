@@ -3,7 +3,7 @@ import datetime
 class schedulah_keyboard():
 
 
-    def __init__(self, layout=[3, 4], defaults=['/start', '/back', '/done']):
+    def __init__(self, layout=[3, 4], defaults=['/start', '/done']):
         self.layout = layout
         self.defaults = defaults
 
