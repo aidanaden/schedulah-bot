@@ -416,7 +416,7 @@ def back_to_start_state(update, context):
     Move back to start state.
     """
     
-    return CREATE_EDIT
+    return ConversationHandler.entry_points
 
 
 
@@ -468,7 +468,7 @@ def main():
                 MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), view_and_exit)
             ]
         },
-        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', back_to_start_state)],
+        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', start)],
         name='my_schedulah',
         persistent=True
     )
