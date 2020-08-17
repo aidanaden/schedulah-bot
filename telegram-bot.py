@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 
-CREATE_EDIT, DAY, VIEW, EDIT, CONFIRM_EDIT, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
+CREATE_EDIT, DAY, VIEW, EDIT, CONFIRM_EDIT, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(8)
 
 
 
@@ -103,7 +103,7 @@ def edit_existing_calender(update, context):
 def edit_day_activity(update, context):
     """User replies with day they want to edit. Ask user for name of activity they want to edit."""
 
-    
+
     day = update.message.text
     day_activities = get_day_activities(day, context)
 
