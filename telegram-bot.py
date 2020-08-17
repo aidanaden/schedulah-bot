@@ -108,7 +108,7 @@ def edit_day_activity(update, context):
     day_activities = get_day_activities(day, context)
 
 
-    reply_msg = f"""Activites for <b>{day.lower()}</b>\n\n{day_activities}\n\nWhich activity do you wanna edit? (pls enter name of activity tenks)"""
+    reply_msg = f"""</b>\n\n{day_activities}\n\nWhich activity do you wanna edit? (pls enter name of activity tenks)"""
 
 
     update.message.reply_text(reply_msg, parse_mode=ParseMode.HTML)
@@ -451,6 +451,18 @@ def main():
 
             EDIT: [
                 MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), edit_day_activity)
+            ],
+
+            CHOOSE_ACTIVITY_EDIT: [
+
+            ],
+
+            EDITING_ACTIVITY: [
+                
+            ],
+
+            CONFIRM_EDIT: [
+
             ],
 
             ACTIVITY: [
