@@ -19,8 +19,6 @@ logger = logging.getLogger(__name__)
 
 CREATE_EDIT, DAY, VIEW, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
 
-VIEW_VALUES = [' Monday ',' Tuesday ',' Wednesday ',' Thursday ',' Friday ',' Saturday ', ' Sunday ',' View All Days ']
-
 
 
 
@@ -379,8 +377,6 @@ You may also proceed to view your existing calender before exiting the bot!"""
 
 
 
-
-
 def completed_and_exit(update, context):
     """
     User confirms exit, end conversation and quit from schedulah-bot
@@ -407,16 +403,6 @@ def view_and_exit(update, context):
 
     
     return ConversationHandler.END
-
-
-
-
-def back_to_start_state(update, context):
-    """
-    Move back to start state.
-    """
-    
-    return ConversationHandler.entry_points
 
 
 
@@ -468,7 +454,7 @@ def main():
                 MessageHandler(Filters.regex('^(View schedule and tHEN exit!)$'), view_and_exit)
             ]
         },
-        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('back', start)],
+        fallbacks=[CommandHandler('done', confirm_complete), CommandHandler('start', start)],
         name='my_schedulah',
         persistent=True
     )
