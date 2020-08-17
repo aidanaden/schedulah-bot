@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 
-CREATE_EDIT, DAY, VIEW, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
+CREATE_EDIT, DAY, VIEW, EDIT, CONFIRM_EDIT, ACTIVITY, ADDED_ACTIVITY, COMPLETED = range(6)
 
 
 
@@ -95,7 +95,44 @@ def edit_existing_calender(update, context):
         reply_markup=ReplyKeyboardMarkup(days_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
 
-    return None
+    return EDIT
+
+
+
+
+def edit_day_activity(update, context):
+    """User replies with day they want to edit. Ask user for name of activity they want to edit."""
+
+    
+    day = update.message.text
+    day_activities = get_day_activities(day, context)
+
+
+    reply_msg = f"""Activites for <b>{day.lower()}</b>\n\n{day_activities}\n\nWhich activity do you wanna edit? (pls enter name of activity tenks)"""
+
+
+    update.message.reply_text(reply_msg, parse_mode=ParseMode.HTML)
+
+
+    return CONFIRM_EDIT
+
+
+
+
+def confirm_complete_edit(update, context):
+    """User completed editing activities in a specific day they selected, 
+    ask user if done or want to edit another day"""
+
+
+    exit_values = ['Continue editing!', 'Change day!']
+    exit_keyboard = schedulah_keyboard(layout=[2]).create_keyboard(exit_values)
+    
+
+    reply_msg = f"""Add more activities to your <b>{day.lower()}</b> schedule? or add activities to another day?"""
+
+
+    update.message.reply_text(reply_msg, 
+    reply_markup=ReplyKeyboardMarkup(exit_keyboard, resize_keyboard=True, one_time_keyboard=True), parse_mode=ParseMode.HTML)
 
 
 
@@ -227,28 +264,6 @@ DETAILS: ELEARNING until further notice"""
 
 
 
-def get_activity_time_start_end_to_datetime(activity_time):
-    """
-    Receive activity time string in format XXXX-XXXX
-    EXAMPLE:
-    
-    1200-1400
-    """
-
-
-    activity_time_start = activity_time.split('-')[0].strip()
-    activity_time_end = activity_time.split('-')[1].strip()
-
-
-    activity_time_start_dt = datetime.strptime(activity_time_start, '%H%M')
-    activity_time_end_dt = datetime.strptime(activity_time_end, '%H%M')
-
-    
-    return activity_time_start_dt, activity_time_end_dt
-
-
-
-
 def add_activity_calender_day(update, context):
     """User enters activity, add activity to the schedule of the selected day"""
 
@@ -294,7 +309,7 @@ def add_activity_calender_day(update, context):
     exit_keyboard = schedulah_keyboard(layout=[2]).create_keyboard(exit_values)
     
 
-    reply_msg = f"""Would you like to add more activities to your <b>{day.lower()}</b> schedule or would you like to add activities to another day?"""
+    reply_msg = f"""Add more activities to your <b>{day.lower()}</b> schedule? or add activities to another day?"""
 
 
     update.message.reply_text(reply_msg, 
@@ -432,6 +447,10 @@ def main():
             VIEW: [
                 MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), view_calender_day), 
                 MessageHandler(Filters.regex('^(View All Days)$'), view_all_calender_days)
+            ],
+
+            EDIT: [
+                MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), edit_calender_day)
             ],
 
             ACTIVITY: [
