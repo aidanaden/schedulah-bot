@@ -209,7 +209,7 @@ def enter_calender_day(update, context):
 
     # request user to add activity in 
     # ACTIVITY FORMAT
-    reply_msg = f"""Accessing your {text} schedule!
+    reply_msg = f"""Accessing your <b>{text.lower()}</b> schedule!
 To add an activity to your schedule,
 Enter the details of your activity in the format below.
         
@@ -220,7 +220,7 @@ LOCATION: HOME
 DETAILS: ELEARNING until further notice"""
 
 
-    update.message.reply_text(reply_msg)
+    update.message.reply_text(reply_msg, parse_mode=ParseMode.HTML)
 
     return ACTIVITY
 
