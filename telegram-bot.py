@@ -450,7 +450,7 @@ def main():
             ],
 
             EDIT: [
-                MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), edit_calender_day)
+                MessageHandler(Filters.regex('^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$'), edit_day_activity)
             ],
 
             ACTIVITY: [
