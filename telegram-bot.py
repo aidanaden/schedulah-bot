@@ -167,11 +167,9 @@ def view_calender_day(update, context):
     day = update.message.text
 
     
-    if day not in context.user_data:
-        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {day} yet!')
+    if day not in context.user_data or context.user_data[day] is None:
+        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on <b>{day.lower()}</b> yet!', parse_mode=ParseMode.HTML)
 
-    elif context.user_data[day] is None:
-        update.message.reply_text(f'Sorry! Looks like you haven\'t created any activities on {day} yet!')
     
     else:
     
@@ -285,8 +283,8 @@ def add_activity_calender_day(update, context):
         context.user_data[day] = [activity]
 
     else:
-        update.message.reply_text(f"""Looks like you\'ve already got some activities set for your {day} schedule!
-        \nAdding your newly created activity: \"{activity_name}\" to your schedule!""")
+        update.message.reply_text(f"""Looks like you\'ve already got some activities set for your <b>{day.lower()}</b> schedule!
+        \nAdding your newly created activity: \"{activity_name}\" to your <b>{day.lower()}</b> schedule!""", parse_mode=ParseMode.HTML)
 
         # TODO: CHECK IF NEW ACTIVITY ADDED COINCIDES WITH ANY EXISTING ACTIVITIES
         
@@ -297,13 +295,11 @@ def add_activity_calender_day(update, context):
     exit_keyboard = schedulah_keyboard(layout=[2]).create_keyboard(exit_values)
     
 
-    reply_msg = f"""Would you like to add more activities 
-to your {day} schedule or would you like 
-to add activities to another day?"""
+    reply_msg = f"""Would you like to add more activities to your <b>{day.lower()}</b> schedule or would you like to add activities to another day?"""
 
 
     update.message.reply_text(reply_msg, 
-    reply_markup=ReplyKeyboardMarkup(exit_keyboard, resize_keyboard=True, one_time_keyboard=True))
+    reply_markup=ReplyKeyboardMarkup(exit_keyboard, resize_keyboard=True, one_time_keyboard=True), parse_mode=ParseMode.HTML)
 
     
     return ADDED_ACTIVITY
@@ -318,7 +314,7 @@ def add_more_activities_calender_day(update, context):
     day = context.user_data['day']   
 
 
-    reply_msg = f"""Adding to your {day} schedule!
+    reply_msg = f"""Adding to your <b>{day.lower()}</b> schedule!
 To add an activity to your schedule,
 Enter the details of your activity in the format below.
         
@@ -329,7 +325,7 @@ LOCATION: HOME
 DETAILS: ELEARNING until further notice"""
 
 
-    update.message.reply_text(reply_msg)
+    update.message.reply_text(reply_msg, parse_mode=ParseMode.HTML)
 
 
     return ACTIVITY
