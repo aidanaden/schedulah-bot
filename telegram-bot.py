@@ -41,7 +41,7 @@ Create your weekly/daily schedule with us and we'll send reminders for your acti
 How to use me?
 
 
-I've got 3 commands:
+I've got 4 commands:
 
 1. /create
 2. /edit
@@ -106,7 +106,7 @@ def view_existing_calender(update, context):
     """View existing calender/timetable"""
 
     view_days_values = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday', 'View All Days']
-    view_keyboard = schedulah_keyboard(layout=(3,4,1)).create_keyboard(view_day_values)
+    view_keyboard = schedulah_keyboard(layout=(3,4,1)).create_keyboard(view_days_values)
 
     update.message.reply_text(
         'Viewing your existing calender!'
