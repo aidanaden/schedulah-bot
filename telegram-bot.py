@@ -107,8 +107,7 @@ def view_existing_calender(update, context):
     view_keyboard = schedulah_keyboard(layout=(3,4,1)).create_keyboard(view_days_values)
 
     update.message.reply_text(
-        'Viewing your existing calender!'
-        'Which day would you like to view activities for? :)',
+        'Viewing your existing calender! Which day would you like to view activities for? :)',
         reply_markup=ReplyKeyboardMarkup(view_keyboard, resize_keyboard=True, one_time_keyboard=False))
 
     
@@ -214,7 +213,7 @@ def enter_calender_day(update, context):
 To add an activity to your schedule,
 Enter the details of your activity in the format below.
         
-<EXAMPLE>
+<b>EXAMPLE</b>
 TIME: 1200-1400
 NAME: CS2030
 LOCATION: HOME
@@ -318,7 +317,7 @@ def add_more_activities_calender_day(update, context):
 To add an activity to your schedule,
 Enter the details of your activity in the format below.
         
-<EXAMPLE>
+<b>EXAMPLE</b>
 TIME: 1200-1400
 NAME: CS2030
 LOCATION: HOME
